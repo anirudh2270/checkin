@@ -3,51 +3,64 @@ import { toast } from "sonner";
 import type { ValidationErrorResponse } from "./types";
 
 export const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_BASE_URL,
-  timeout: 1000,
-  headers: {},
+	baseURL: import.meta.env.VITE_BASE_URL,
+	timeout: 1000,
+	headers: {},
+	withCredentials: true,
 });
 
 axiosInstance.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
+	const token = localStorage.getItem("token");
+	if (token) {
+		config.headers.Authorization = `Bearer ${token}`;
+	}
+
+	return config;
 });
 
 const errorHandlers: Record<string, (error: AxiosError) => void> = {
-  VALIDATION_ERROR: (error) => {
-    const data = error.response?.data as ValidationErrorResponse;
-    data.errors?.forEach((err) => toast.error(err.message));
-  },
-  FORBIDDEN: (error) => {
-    const data = error.response?.data as ValidationErrorResponse;
-    toast.error(data.message);
-  },
-  NOT_FOUND: (error) => {
-    const data = error.response?.data as ValidationErrorResponse;
-    toast.error(data.message);
-  },
-  INTERNAL_SERVER_ERROR: (error) => {
-    const data = error.response?.data as ValidationErrorResponse;
-    toast.error(data.message);
-  },
+	VALIDATION_ERROR: (error) => {
+		const data = error.response?.data as ValidationErrorResponse;
+		data.errors?.forEach((err) => toast.error(err.message));
+	},
+	FORBIDDEN: (error) => {
+		const data = error.response?.data as ValidationErrorResponse;
+		toast.error(data.message);
+	},
+	NOT_FOUND: (error) => {
+		const data = error.response?.data as ValidationErrorResponse;
+		toast.error(data.message);
+	},
+	CONFLICT: (error) => {
+		const data = error.response?.data as ValidationErrorResponse;
+		toast.error(data.message);
+	},
+	INTERNAL_SERVER_ERROR: (error) => {
+		const data = error.response?.data as ValidationErrorResponse;
+		toast.error(data.message);
+	},
+	BAD_REQUEST: (error) => {
+		const data = error.response?.data as ValidationErrorResponse;
+		toast.error(data.message);
+	},
 };
 
 axiosInstance.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    const code = error?.response?.data?.code;
-    if (code && errorHandlers[code]) {
-      errorHandlers[code](error);
-    } else {
-      toast.error("An unexpected error occurred.");
-    }
-    return Promise.reject(error);
-  },
+	(response) => response,
+	(error) => {
+		const code = error?.response?.data?.code;
+		if (code && errorHandlers[code]) {
+			errorHandlers[code](error);
+		} else {
+			toast.error("An unexpected error occurred.");
+		}
+		return Promise.reject(error);
+	},
 );
 
 export function PostRequest(params: { url: string; data: object }) {
-  return axiosInstance.post(params.url, params.data);
+	return axiosInstance.post(params.url, params.data);
+}
+export function GetRequest(params: { url: string }) {
+	return axiosInstance.get(params.url);
 }

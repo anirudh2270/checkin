@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Controller, useForm } from "react-hook-form";
 import {
 	Card,
 	CardContent,
@@ -8,8 +7,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { motion, type HTMLMotionProps } from "motion/react";
-import { zodResolver } from "@hookform/resolvers/zod";
+import GoogleLogo from "@/assets/images/google.svg";
 import {
 	Field,
 	FieldDescription,
@@ -19,35 +17,36 @@ import {
 	FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import GoogleLogo from "@/assets/images/google.svg";
+import { motion, type HTMLMotionProps } from "motion/react";
+import { signupSchema } from "@/validationSchema";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { PostRequest } from "@/networkHandler";
 import type z from "zod";
-import { loginSchema } from "@/validationSchema";
 import TermsService from "./terms-service";
 import { useNavigate } from "@tanstack/react-router";
 
-export function LoginForm({ className, ...props }: HTMLMotionProps<"div">) {
+export function SignupForm({ className, ...props }: HTMLMotionProps<"div">) {
 	const navigate = useNavigate();
 	const mutation = useMutation({
-		mutationFn: (data: object) => PostRequest({ url: "auth/login", data }),
-		onSuccess: (data) => {
-			if (data?.data?.next_step === "2fa_setup") {
-				navigate({
-					to: "/auth/setup_2fa",
-				});
-			}
+		mutationFn: (data: object) => PostRequest({ url: "auth/signup", data }),
+		onSuccess: () => {
+			navigate({
+				to: "/auth/2fa",
+			});
 		},
 	});
 
-	const form = useForm<z.infer<typeof loginSchema>>({
-		resolver: zodResolver(loginSchema),
+	const form = useForm<z.infer<typeof signupSchema>>({
+		resolver: zodResolver(signupSchema),
 		defaultValues: {
 			email: "",
+			fullName: "",
 		},
 	});
 
-	function onSubmit(data: z.infer<typeof loginSchema>) {
+	function onSubmit(data: z.infer<typeof signupSchema>) {
 		mutation.mutate(data);
 	}
 
@@ -60,13 +59,13 @@ export function LoginForm({ className, ...props }: HTMLMotionProps<"div">) {
 			{...props}>
 			<Card className="shadow-2xl">
 				<CardHeader className="text-center">
-					<CardTitle className="text-xl">Welcome back</CardTitle>
+					<CardTitle className="text-xl">Create your account</CardTitle>
 					<CardDescription>
-						Login with your Apple or Google account
+						Sign up with your Apple or Google account
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<form id="form-login" onSubmit={form.handleSubmit(onSubmit)}>
+					<form id="form-signup" onSubmit={form.handleSubmit(onSubmit)}>
 						<FieldGroup>
 							<Field>
 								<Button disabled variant="outline" type="button">
@@ -76,43 +75,77 @@ export function LoginForm({ className, ...props }: HTMLMotionProps<"div">) {
 											fill="currentColor"
 										/>
 									</svg>
-									Login with Apple
+									Sign up with Apple
 								</Button>
 								<Button variant="outline" type="button">
 									<img src={GoogleLogo} width={18} height={18} alt="Google" />
-									Login with Google
+									Sign up with Google
 								</Button>
 							</Field>
 							<FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
 								Or continue with
 							</FieldSeparator>
+
+							<Controller
+								name="fullName"
+								control={form.control}
+								render={({ field, fieldState }) => (
+									<Field>
+										<FieldLabel
+											data-invalid={fieldState.invalid}
+											htmlFor="fullName">
+											Full Name
+										</FieldLabel>
+										<Input
+											{...field}
+											id="fullName"
+											type="text"
+											placeholder="John Doe"
+											required
+										/>
+										{fieldState.invalid && (
+											<FieldError errors={[fieldState.error]} />
+										)}
+									</Field>
+								)}></Controller>
+
 							<Controller
 								name="email"
 								control={form.control}
 								render={({ field, fieldState }) => (
-									<Field data-invalid={fieldState.invalid}>
-										<FieldLabel htmlFor="email">Email</FieldLabel>
+									<Field>
+										<FieldLabel
+											data-invalid={fieldState.invalid}
+											htmlFor="email">
+											Email
+										</FieldLabel>
 										<Input
 											{...field}
 											id="email"
 											type="email"
 											placeholder="m@example.com"
 											required
-											aria-invalid={fieldState.invalid}
 										/>
+										<FieldDescription className="text-[0.83rem]">
+											{" "}
+											We'll use this to contact you. We will not share your
+											email with anyone else.
+										</FieldDescription>
 										{fieldState.invalid && (
 											<FieldError errors={[fieldState.error]} />
 										)}
 									</Field>
-								)}
-							/>
+								)}></Controller>
 
 							<Field>
-								<Button loading={mutation.isPending} type="submit">
-									Login
+								<Button
+									type="submit"
+									loading={mutation.isPending}
+									form="form-signup">
+									Create Account
 								</Button>
 								<FieldDescription className="text-center">
-									Don&apos;t have an account? <a href="/auth/signup">Sign up</a>
+									Already have an account? <a href="/auth/login">Sign in</a>
 								</FieldDescription>
 							</Field>
 						</FieldGroup>

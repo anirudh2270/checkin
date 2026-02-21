@@ -11,6 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AuthVerify_2faRouteImport } from './routes/auth/verify_2fa'
+import { Route as AuthSignupRouteImport } from './routes/auth/signup'
+import { Route as AuthSetup_2faRouteImport } from './routes/auth/setup_2fa'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 
 const AppRouteRoute = AppRouteRouteImport.update({
@@ -22,6 +25,21 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AuthVerify_2faRoute = AuthVerify_2faRouteImport.update({
+  id: '/auth/verify_2fa',
+  path: '/auth/verify_2fa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSignupRoute = AuthSignupRouteImport.update({
+  id: '/auth/signup',
+  path: '/auth/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSetup_2faRoute = AuthSetup_2faRouteImport.update({
+  id: '/auth/setup_2fa',
+  path: '/auth/setup_2fa',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
   id: '/auth/login',
   path: '/auth/login',
@@ -31,28 +49,57 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/auth/login': typeof AuthLoginRoute
+  '/auth/setup_2fa': typeof AuthSetup_2faRoute
+  '/auth/signup': typeof AuthSignupRoute
+  '/auth/verify_2fa': typeof AuthVerify_2faRoute
 }
 export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
+  '/auth/setup_2fa': typeof AuthSetup_2faRoute
+  '/auth/signup': typeof AuthSignupRoute
+  '/auth/verify_2fa': typeof AuthVerify_2faRoute
   '/': typeof AppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteRouteWithChildren
   '/auth/login': typeof AuthLoginRoute
+  '/auth/setup_2fa': typeof AuthSetup_2faRoute
+  '/auth/signup': typeof AuthSignupRoute
+  '/auth/verify_2fa': typeof AuthVerify_2faRoute
   '/_app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth/login'
+  fullPaths:
+    | '/'
+    | '/auth/login'
+    | '/auth/setup_2fa'
+    | '/auth/signup'
+    | '/auth/verify_2fa'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth/login' | '/'
-  id: '__root__' | '/_app' | '/auth/login' | '/_app/'
+  to:
+    | '/auth/login'
+    | '/auth/setup_2fa'
+    | '/auth/signup'
+    | '/auth/verify_2fa'
+    | '/'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/auth/login'
+    | '/auth/setup_2fa'
+    | '/auth/signup'
+    | '/auth/verify_2fa'
+    | '/_app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AppRouteRoute: typeof AppRouteRouteWithChildren
   AuthLoginRoute: typeof AuthLoginRoute
+  AuthSetup_2faRoute: typeof AuthSetup_2faRoute
+  AuthSignupRoute: typeof AuthSignupRoute
+  AuthVerify_2faRoute: typeof AuthVerify_2faRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -70,6 +117,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRouteRoute
+    }
+    '/auth/verify_2fa': {
+      id: '/auth/verify_2fa'
+      path: '/auth/verify_2fa'
+      fullPath: '/auth/verify_2fa'
+      preLoaderRoute: typeof AuthVerify_2faRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/signup': {
+      id: '/auth/signup'
+      path: '/auth/signup'
+      fullPath: '/auth/signup'
+      preLoaderRoute: typeof AuthSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/setup_2fa': {
+      id: '/auth/setup_2fa'
+      path: '/auth/setup_2fa'
+      fullPath: '/auth/setup_2fa'
+      preLoaderRoute: typeof AuthSetup_2faRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/auth/login': {
       id: '/auth/login'
@@ -96,6 +164,9 @@ const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   AppRouteRoute: AppRouteRouteWithChildren,
   AuthLoginRoute: AuthLoginRoute,
+  AuthSetup_2faRoute: AuthSetup_2faRoute,
+  AuthSignupRoute: AuthSignupRoute,
+  AuthVerify_2faRoute: AuthVerify_2faRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
